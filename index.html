@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Área de Trabalho</title>
+<style>
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;overflow:hidden;user-select:none;-webkit-user-select:none;}
+body{
+  font-family:Tahoma,Verdana,Arial,sans-serif;font-size:13px;
+  background:
+    radial-gradient(ellipse 120% 40% at 30% 100%, #4f9a2c 0%, #3d8a1f 55%, transparent 56%),
+    radial-gradient(ellipse 100% 35% at 90% 105%, #62b13a 0%, #4a9a26 55%, transparent 56%),
+    linear-gradient(#2f6fd6 0%, #6aa8f0 55%, #bfe0ff 100%);
+}
+
+/* ---------- barra de tarefas ---------- */
+#taskbar{
+  position:fixed;left:0;right:0;bottom:0;height:40px;display:flex;align-items:stretch;z-index:50;
+  background:linear-gradient(#3168d5 0%,#4993e6 8%,#2a69e0 18%,#245edb 50%,#2158d4 90%,#1941a5 100%);
+  border-top:1px solid #0c3fb8;
+}
+#start{
+  display:flex;align-items:center;padding:0 22px 0 14px;cursor:pointer;
+  font:italic bold 20px Tahoma,Verdana,sans-serif;color:#fff;text-shadow:1px 1px 2px #1a4d12;
+  background:linear-gradient(#5fc34f 0%,#3ea82b 45%,#2f8f1f 100%);
+  border-radius:0 14px 14px 0;box-shadow:inset 0 1px 1px rgba(255,255,255,.5),2px 0 4px rgba(0,0,0,.4);
+}
+#start:hover{filter:brightness(1.08);}
+#start.ativo{filter:brightness(.88);}
+#tasks{flex:1;}
+#tray{
+  display:flex;align-items:center;gap:10px;padding:0 14px;color:#fff;font-size:12px;line-height:1.15;
+  background:linear-gradient(#0f8ae8 0%,#1a9cf0 15%,#0e84e0 60%,#0a6fc9 100%);
+  border-left:1px solid #0a3fa0;box-shadow:inset 1px 0 2px rgba(255,255,255,.4);
+}
+#tray .ico{font-size:18px;}
+#hora{text-align:right;}
+#hora b{display:block;font-size:13px;}
+
+/* ---------- menu iniciar ---------- */
+#menu{
+  position:fixed;left:0;bottom:40px;width:380px;z-index:60;overflow:hidden;
+  border:2px solid #0a3fc4;border-bottom:0;border-radius:9px 9px 0 0;background:#fff;
+  box-shadow:3px -2px 12px rgba(0,0,0,.5);
+  visibility:hidden;transform:translateY(40px);opacity:0;
+  transition:transform .18s ease-out,opacity .18s ease-out,visibility 0s .18s;
+}
+#menu.aberto{visibility:visible;transform:translateY(0);opacity:1;transition:transform .18s ease-out,opacity .18s ease-out;}
+#menu .topo{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;color:#fff;font-weight:bold;font-size:15px;
+  background:linear-gradient(#3a8cff 0%,#0a5be0 50%,#0a4bc8 100%);text-shadow:1px 1px 1px #0a2a80;
+}
+#menu .avatar{width:38px;height:38px;border-radius:5px;border:2px solid #fff;background:#cfe3ff;display:flex;align-items:center;justify-content:center;font-size:22px;}
+#menu .cols{display:flex;}
+#menu .esq{flex:1.15;background:#fff;padding:6px 0;}
+#menu .dir{flex:1;background:#d3e5fa;border-left:1px solid #95bdee;padding:6px 0;}
+.it{display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;color:#000;}
+.it .i{font-size:22px;width:26px;text-align:center;}
+.it .t b{display:block;font-size:13px;}
+.it .t small{display:block;font-size:10px;color:#666;}
+.dir .it{color:#0a2a6e;padding:6px 12px;}
+.dir .it .i{font-size:18px;width:22px;}
+.it:hover{background:#316ac5;color:#fff;}
+.it:hover small{color:#dbe7ff;}
+.esq hr,.dir hr{border:0;border-top:1px solid #d4d0c8;margin:4px 10px;}
+#menu .rodape{display:flex;justify-content:flex-end;gap:12px;padding:6px 10px;background:linear-gradient(#0a5be0,#0a4bc8);color:#fff;font-size:12px;}
+#menu .rodape span{cursor:pointer;padding:2px 6px;border-radius:3px;}
+#menu .rodape span:hover{background:rgba(255,255,255,.25);}
+
+/* ---------- balão de aviso ---------- */
+#balao{
+  position:fixed;left:14px;bottom:56px;width:300px;z-index:70;display:none;
+  background:#ffffe1;color:#000;border:1px solid #000;border-radius:8px;padding:10px 12px 12px;font-size:12px;
+  box-shadow:2px 3px 8px rgba(0,0,0,.45);
+}
+#balao.aberto{display:block;}
+#balao::after{content:"";position:absolute;left:30px;bottom:-11px;border-left:8px solid transparent;border-right:8px solid transparent;border-top:11px solid #000;}
+#balao::before{content:"";position:absolute;left:31px;bottom:-9px;z-index:1;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid #ffffe1;}
+#balao .tit{font-weight:bold;margin-bottom:4px;display:flex;gap:6px;align-items:center;}
+#balao .x{margin-left:auto;width:16px;height:16px;line-height:14px;text-align:center;cursor:pointer;border:1px solid #666;border-radius:3px;font-size:11px;background:#f4f1dc;}
+</style>
+</head>
+<body>
+
+<div id="taskbar">
+  <div id="start">iniciar</div>
+  <div id="tasks"></div>
+  <div id="tray"><span class="ico" title="Computador">🖥️</span><div id="hora"><b id="relogio">--:--</b><span id="data">--/--/----</span></div></div>
+</div>
+
+<div id="menu">
+  <div class="topo"><div class="avatar">👤</div><span id="nomeUsuario"></span></div>
+  <div class="cols">
+    <div class="esq" id="listaProgramas"></div>
+    <div class="dir" id="listaSistema"></div>
+  </div>
+  <div class="rodape" id="listaRodape"></div>
+</div>
+
+<div id="balao">
+  <div class="tit"><span>ℹ️</span><span>Link não configurado</span><span class="x" id="fecharBalao">✕</span></div>
+  <span id="balaoTexto"></span>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURAÇÃO — É AQUI QUE VOCÊ MEXE
+   ---------------------------------------------------------------------
+   Em cada item, preencha o campo  link  com o endereço da página nova.
+   Exemplos:   link: 'meu-computador.html'
+               link: 'https://seusite.com/pagina.html'
+   Enquanto o link estiver vazio ('') aparece um balão avisando que falta o link.
+   ===================================================================== */
+
+// true  = abre a página em uma NOVA aba
+// false = abre na MESMA aba
+var ABRIR_EM_NOVA_ABA = false;
+
+// Nome que aparece no topo do menu iniciar
+var NOME_USUARIO = 'Jon MRodrigues';
+
+// ---- Coluna da esquerda (programas) ----
+var PROGRAMAS = [
+  { icone:'🖥️', titulo:'Meu Computador',   sub:'Página principal',    link:'' },   // <-- COLOQUE AQUI o link do Meu Computador
+  { icone:'🌐', titulo:'Internet',         sub:'Navegador',          link:'' },   // <-- (insira o link da próxima página)
+  { icone:'✉️', titulo:'E-mail',           sub:'Mensagens',          link:'' },   // <-- (insira o link da próxima página)
+  { icone:'🎨', titulo:'Paint',            sub:'Desenho',            link:'' },   // <-- (insira o link da próxima página)
+  { icone:'📝', titulo:'Bloco de Notas',   sub:'Anotações',          link:'' },   // <-- (insira o link da próxima página)
+  { icone:'🧮', titulo:'Calculadora',      sub:'Cálculos',           link:'' }    // <-- (insira o link da próxima página)
+];
+
+// ---- Coluna da direita (atalhos do sistema) ----
+var SISTEMA = [
+  { icone:'📁', titulo:'Meus Documentos',   link:'' },   // <-- (insira o link da próxima página)
+  { icone:'🖼️', titulo:'Minhas Imagens',    link:'' },   // <-- (insira o link da próxima página)
+  { icone:'🎵', titulo:'Minha Música',      link:'' },   // <-- (insira o link da próxima página)
+  { icone:'⚙️', titulo:'Painel de Controle', link:'' },   // <-- (insira o link da próxima página)
+  { icone:'🖨️', titulo:'Impressoras',       link:'' },   // <-- (insira o link da próxima página)
+  { icone:'❔', titulo:'Ajuda e Suporte',   link:'' }    // <-- (insira o link da próxima página)
+];
+
+// ---- Rodapé do menu ----
+var RODAPE = [
+  { icone:'🔒', titulo:'Fazer logoff', link:'' },       // <-- (insira o link da próxima página)
+  { icone:'⏻',  titulo:'Desligar',     link:'' }        // <-- (insira o link da próxima página)
+];
+/* ===================== FIM DA CONFIGURAÇÃO ===================== */
+
+
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  var menu = $('menu'), start = $('start'), balao = $('balao');
+  var todos = [];   // todos os itens, para achar o link pelo índice
+
+  function montar(lista, destino, comSub, rodape){
+    var h = '';
+    lista.forEach(function(it){
+      var idx = todos.push(it) - 1;
+      if(rodape){
+        h += '<span data-i="' + idx + '">' + esc(it.icone) + ' ' + esc(it.titulo) + '</span>';
+      } else {
+        h += '<div class="it" data-i="' + idx + '"><span class="i">' + esc(it.icone) + '</span><span class="t"><b>' + esc(it.titulo) + '</b>' +
+          (comSub && it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></div>';
+      }
+    });
+    destino.innerHTML = h;
+  }
+  $('nomeUsuario').textContent = NOME_USUARIO;
+  montar(PROGRAMAS, $('listaProgramas'), true, false);
+  montar(SISTEMA, $('listaSistema'), false, false);
+  montar(RODAPE, $('listaRodape'), false, true);
+
+  function fecharMenu(){ menu.classList.remove('aberto'); start.classList.remove('ativo'); }
+  function fecharBalao(){ balao.classList.remove('aberto'); }
+  var timerBalao = null;
+  function avisar(titulo){
+    $('balaoTexto').innerHTML = 'O item <b>' + esc(titulo) + '</b> ainda não tem link. Abra o index.html em um editor e preencha o campo <b>link</b> na seção CONFIGURAÇÃO, no topo do código.';
+    balao.classList.add('aberto');
+    clearTimeout(timerBalao);
+    timerBalao = setTimeout(fecharBalao, 7000);
+  }
+  function abrir(it){
+    var l = (it.link || '').trim();
+    if(!l){ avisar(it.titulo); return; }
+    if(ABRIR_EM_NOVA_ABA) window.open(l, '_blank', 'noopener');
+    else window.location.href = l;
+  }
+
+  start.addEventListener('click', function(ev){
+    ev.stopPropagation();
+    fecharBalao();
+    var abrindo = !menu.classList.contains('aberto');
+    if(abrindo){ menu.classList.add('aberto'); start.classList.add('ativo'); } else fecharMenu();
+  });
+  menu.addEventListener('click', function(ev){
+    ev.stopPropagation();
+    var el = ev.target;
+    while(el && el !== menu && !(el.getAttribute && el.getAttribute('data-i') != null)) el = el.parentNode;
+    if(!el || el === menu) return;
+    var it = todos[+el.getAttribute('data-i')];
+    fecharMenu();
+    abrir(it);
+  });
+  document.addEventListener('click', fecharMenu);
+  document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ fecharMenu(); fecharBalao(); } });
+  $('fecharBalao').addEventListener('click', fecharBalao);
+
+  /* relógio com data */
+  function relogio(){
+    var d = new Date();
+    $('relogio').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+    $('data').textContent = pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear();
+  }
+  relogio();
+  setInterval(relogio, 10000);
+})();
+</script>
+</body>
+</html>
